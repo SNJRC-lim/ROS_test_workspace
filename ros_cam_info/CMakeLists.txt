@@ -27,6 +27,9 @@ include_directories(
 
 link_directories(${OpenCV_LIB_DIRS})
 
+add_executable(main_controler src/main_controler.cpp)
+target_link_libraries(main_controler ${catkin_LIBRARIES})
+
 add_executable(cam_info_publisher src/cam_info_publisher.cpp)
 target_link_libraries(cam_info_publisher ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
