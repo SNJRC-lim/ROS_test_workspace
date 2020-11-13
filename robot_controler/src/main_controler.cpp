@@ -1,12 +1,18 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int16.h>
+#include <std_msgs/Int8.h>
 #include <mutex>
 
 ///options///
 //#define demo
 
 ////////////
+
+///Publish Data///
+static std_msgs::Int16 robot_go_angle; //-314~314
+static std_msgs::Int8 robot_go_speed; //0~255
 
 ///ball middle point x y allay///
 static std_msgs::Float32MultiArray ball_point_array;
@@ -57,6 +63,9 @@ int main(int argc, char** argv){
   ros::Subscriber sub1 = nh.subscribe("ball_point_array", 1, CamInfoCallback);
   ros::Subscriber sub2 = nh.subscribe("robot_still_alive", 1, ArduinoInfo1Callback);
   ros::Subscriber sub3 = nh.subscribe("processing_white_line", 1, ArduinoInfo2Callback);
+
+  ros::Publisher pub1 = nh.advertise<std_msgs::Int16>("robot_go_angle" , 1);
+  ros::Publisher pub2 = nh.advertise<std_msgs::Int8>("robot_go_speed" , 1);
 
   ros::AsyncSpinner spinner(1);
   spinner.start();
