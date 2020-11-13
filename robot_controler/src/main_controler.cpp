@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Bool.h>
 #include <mutex>
 
 ///options///
@@ -9,6 +10,11 @@
 
 ///ball middle point x y allay///
 static std_msgs::Float32MultiArray ball_point_array;
+////////////
+
+///from serial node///
+static std_msgs::Bool robot_still_alive;
+static std_msgs::Bool processing_white_line;
 ////////////
 
 ///set mutex///
@@ -31,11 +37,26 @@ void CamInfoCallback(const std_msgs::Float32MultiArray &ball){
 #endif 
 }
 
+void ArduinoInfo1Callback(const std_msgs::Bool &alive){
+  std::lock_guard<std::mutex> lock(mutex);
+
+  robot_still_alive.data = alive.data;  
+}
+
+void ArduinoInfo2Callback(const std_msgs::Bool &white){
+  std::lock_guard<std::mutex> lock(mutex);
+
+  processing_white_line.data = white.data; 
+}
+
 int main(int argc, char** argv){
   ball_point_array.data.resize(2);
   ros::init(argc, argv, "main_controler");
   ros::NodeHandle nh;
-  ros::Subscriber sub = nh.subscribe("ball_point_array", 1, CamInfoCallback);
+  
+  ros::Subscriber sub1 = nh.subscribe("ball_point_array", 1, CamInfoCallback);
+  ros::Subscriber sub2 = nh.subscribe("robot_still_alive", 1, ArduinoInfo1Callback);
+  ros::Subscriber sub3 = nh.subscribe("processing_white_line", 1, ArduinoInfo2Callback);
 
   ros::AsyncSpinner spinner(1);
   spinner.start();
