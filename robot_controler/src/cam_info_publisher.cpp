@@ -54,7 +54,7 @@ int main(int argc, char** argv){
     ros::init(argc, argv, "cam_info_publisher");
 	ros::NodeHandle nh;
 	
-	ros::Publisher pub = nh.advertise<std_msgs::Float32MultiArray>("ball_point_array" , 1);
+	ros::Publisher pub = nh.advertise<std_msgs::Float32MultiArray>("ball_point_array", 1);
 	
 	ros::Rate rate(60);
 
