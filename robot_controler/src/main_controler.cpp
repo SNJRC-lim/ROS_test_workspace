@@ -1,9 +1,9 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Bool.h>
-#include <std_msgs/Int16.h>
-#include <std_msgs/Int8.h>
+#include <std_msgs/Int16MultiArray.h>
 #include <mutex>
+#include <math.h>
 
 ///options///
 //#define demo
@@ -11,8 +11,8 @@
 ////////////
 
 ///Publish Data///
-static std_msgs::Int16 robot_go_angle; //-314~314
-static std_msgs::Int8 robot_go_speed; //0~255
+static std_msgs::Int16MultiArray robot_go_array; //[0] == angle, [1] == speed
+static std_msgs::Bool ball_kick;
 
 ///ball middle point x y allay///
 static std_msgs::Float32MultiArray ball_point_array;
@@ -27,6 +27,7 @@ static std_msgs::Bool processing_white_line;
 static std::mutex mutex;
 ////////////
 
+///Call Back funcsions///
 void CamInfoCallback(const std_msgs::Float32MultiArray &ball){
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -54,9 +55,17 @@ void ArduinoInfo2Callback(const std_msgs::Bool &white){
 
   processing_white_line.data = white.data; 
 }
+/////////////
 
+///Coordinate conversion funcsions///
+float ball_angle(){
+  return atan2f(ball_point_array.data[1], ball_point_array.data[0]);
+}
+/////////////
 int main(int argc, char** argv){
   ball_point_array.data.resize(2);
+  robot_go_array.data.resize(2);
+
   ros::init(argc, argv, "main_controler");
   ros::NodeHandle nh;
   
@@ -64,8 +73,8 @@ int main(int argc, char** argv){
   ros::Subscriber sub2 = nh.subscribe("robot_still_alive", 1, ArduinoInfo1Callback);
   ros::Subscriber sub3 = nh.subscribe("processing_white_line", 1, ArduinoInfo2Callback);
 
-  ros::Publisher pub1 = nh.advertise<std_msgs::Int16>("robot_go_angle" , 1);
-  ros::Publisher pub2 = nh.advertise<std_msgs::Int8>("robot_go_speed" , 1);
+  ros::Publisher pub1 = nh.advertise<std_msgs::Int16MultiArray>("robot_go_array", 1);
+  ros::Publisher pub3 = nh.advertise<std_msgs::Bool>("ball_kick", 1);
 
   ros::AsyncSpinner spinner(1);
   spinner.start();
@@ -73,7 +82,7 @@ int main(int argc, char** argv){
   while(ros::ok()){
     mutex.lock();
     
-    printf("x: %f  y: %f\n", ball_point_array.data[0], ball_point_array.data[1]);
+    printf("angle: %f\n", ball_angle());
 
     mutex.unlock();
   }
