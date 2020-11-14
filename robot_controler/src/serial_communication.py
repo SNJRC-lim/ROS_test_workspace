@@ -1,13 +1,12 @@
 import rospy
-import serial
+import rosserial
 from std_msgs.msg import ByteMultiArray
 from std_msgs.msg import Int16MultiArray
 
-serial = serial.Serial('/dev/ttyACM0', 115200, timeout=0.5)
 
 def RobotGoCallback(go):
-    serial.write(go.data[0])
-    serial.write(go.data[1])
+    #serial.write(go.data[0])
+    #serial.write(go.data[1])
 
 
 def communication():
