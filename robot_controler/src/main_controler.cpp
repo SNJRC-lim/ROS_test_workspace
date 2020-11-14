@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/ByteMultiArray.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int16MultiArray.h>
 #include <mutex>
@@ -19,8 +20,7 @@ static std_msgs::Float32MultiArray ball_point_array;
 ////////////
 
 ///from serial node///
-static std_msgs::Bool robot_still_alive;
-static std_msgs::Bool processing_white_line;
+static std_msgs::ByteMultiArray arduino_info_array;
 ////////////
 
 ///set mutex///
@@ -44,16 +44,12 @@ void CamInfoCallback(const std_msgs::Float32MultiArray &ball){
 #endif 
 }
 
-void ArduinoInfo1Callback(const std_msgs::Bool &alive){
+void ArduinoInfoCallback(const std_msgs::ByteMultiArray &arduino){
   std::lock_guard<std::mutex> lock(mutex);
 
-  robot_still_alive.data = alive.data;  
-}
-
-void ArduinoInfo2Callback(const std_msgs::Bool &white){
-  std::lock_guard<std::mutex> lock(mutex);
-
-  processing_white_line.data = white.data; 
+  for (int i = 0; i < 2; i++){
+    arduino_info_array.data[i] = arduino.data[i];
+  }
 }
 /////////////
 
@@ -70,8 +66,7 @@ int main(int argc, char** argv){
   ros::NodeHandle nh;
   
   ros::Subscriber sub1 = nh.subscribe("ball_point_array", 1, CamInfoCallback);
-  ros::Subscriber sub2 = nh.subscribe("robot_still_alive", 1, ArduinoInfo1Callback);
-  ros::Subscriber sub3 = nh.subscribe("processing_white_line", 1, ArduinoInfo2Callback);
+  ros::Subscriber sub2 = nh.subscribe("arduino_info_array", 1, ArduinoInfoCallback);
 
   ros::Publisher pub1 = nh.advertise<std_msgs::Int16MultiArray>("robot_go_array", 1);
   ros::Publisher pub3 = nh.advertise<std_msgs::Bool>("ball_kick", 1);

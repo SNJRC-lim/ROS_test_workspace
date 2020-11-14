@@ -1,6 +1,6 @@
 import rospy
 import serial
-from std_msgs.msg import Bool
+from std_msgs.msg import ByteMultiArray
 from std_msgs.msg import Int16MultiArray
 
 serial = serial.Serial('/dev/ttyACM0', 115200, timeout=0.5)
@@ -12,6 +12,7 @@ def RobotGoCallback(go):
 
 def communication():
     rospy.Subscriber('robot_go_array', Int16MultiArray, RobotGoCallback)
+    pub = rospy.Publisher('arduino_info_array', ByteMultiArray, queue_size=1)
     rospy.init_node('serial_communication', anonymous=True)
 
     rospy.spin()
