@@ -35,6 +35,3 @@ target_link_libraries(main_controler ${catkin_LIBRARIES})
 
 add_executable(cam_info_publisher src/cam_info_publisher.cpp)
 target_link_libraries(cam_info_publisher ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-
-add_executable(cam_info_subscriber src/cam_info_subscriber.cpp)
-target_link_libraries(cam_info_subscriber ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

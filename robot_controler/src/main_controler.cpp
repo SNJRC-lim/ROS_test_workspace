@@ -89,6 +89,7 @@ void robot_go_angle() {
 }
 ////////////////
 
+
 int main(int argc, char** argv){
   ball_point_array.data.resize(2);
   robot_go_array.data.resize(2);
@@ -115,6 +116,7 @@ int main(int argc, char** argv){
     printf("angle: %f  speed: %f\n", robot_go_array.data[0], robot_go_array.data[1]);
 
     mutex.unlock();
+    sleep(0.1);
   }
   return 0;
 }
