@@ -31,8 +31,6 @@ static float ball_angle;
 static std::mutex mutex;
 ////////////
 
-static long i = 0;
-
 ///Call Back funcsions///
 void CamInfoCallback(const std_msgs::Float32MultiArray &ball){
   std::lock_guard<std::mutex> lock(mutex);
@@ -59,7 +57,7 @@ float ball_angle_conv(){
 
 ///decide where to go///
 void robot_go_angle() {
-  /*if (ball_angle <= 0) {
+  if (ball_angle <= 0) {
     ball_angle = ball_angle + M_PI;
   }
   else if (0 < ball_angle) {
@@ -88,7 +86,7 @@ void robot_go_angle() {
   }
   else if ((-M_PI <= ball_angle) && (ball_angle < -M_PI / 2 )) {
     robot_go_array.data[0] = M_PI / 2 + ball_angle;
-  }*/
+  }
 }
 ////////////////
 
@@ -112,88 +110,13 @@ int main(int argc, char** argv){
   while(ros::ok()){
     mutex.lock();
     
-    //ball_angle = ball_angle_conv();
-    //robot_go_angle();
-    //i = i + 1;
-
-    /*if(i <= 1000){
-      robot_go_array.data[0] = 0;
-    }
-
-    else if(i <= 2000){
-      robot_go_array.data[0] = M_PI/6;
-    }
-
-    else if(i <= 3000){
-      robot_go_array.data[0] = M_PI/4;
-    }
-
-    else if(i <= 4000){
-      robot_go_array.data[0] = M_PI/3;
-    }
-
-    else if(i <= 5000){
-      robot_go_array.data[0] = M_PI/2;
-    }
+    ball_angle = ball_angle_conv();
+    robot_go_angle();
     
-    else if(i <= 6000){
-      robot_go_array.data[0] = 2*M_PI/3;
-    }
-  
-    else if(i <= 7000){
-      robot_go_array.data[0] = 3*M_PI/4;
-    }
-
-    else if(i <= 8000){
-      robot_go_array.data[0] = 5*M_PI/6;
-    }
-
-    else if(i <= 9000){
-      robot_go_array.data[0] = M_PI;
-    }
-
-    else if(i <= 10000){
-      robot_go_array.data[0] = -M_PI;
-    }
-
-    else if(i <= 11000){
-      robot_go_array.data[0] = -M_PI/6;
-    }
-
-    else if(i <= 12000){
-      robot_go_array.data[0] = -M_PI/4;
-    }
-
-    else if(i <= 13000){
-      robot_go_array.data[0] = -M_PI/3;
-    }
-
-    else if(i <= 14000){
-      robot_go_array.data[0] = -M_PI/2;
-    }
-
-    else if(i <= 15000){
-      robot_go_array.data[0] = -2*M_PI/3;
-    }
-
-    else if(i <= 16000){
-      robot_go_array.data[0] = -3*M_PI/4;
-    }
-    
-    else if(i <= 17000){
-      robot_go_array.data[0] = -5*M_PI/6;
-
-      i = 0;
-    }*/
-    
-    robot_go_array.data[0] = M_PI/3;
     robot_go_array.data[1] = 100;
-
     pub1.publish(robot_go_array);
-    ball_kick.data = 0;
-    pub2.publish(ball_kick);
+    //pub2.publish(ball_kick);
     printf("angle: %f  speed: %f\n", robot_go_array.data[0], robot_go_array.data[1]);
-    //printf("i: %f\n", i);
 
     mutex.unlock();
     usleep(15000);
