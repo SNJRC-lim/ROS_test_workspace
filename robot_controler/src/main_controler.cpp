@@ -102,7 +102,7 @@ int main(int argc, char** argv){
   ros::Subscriber sub2 = nh.subscribe("arduino_info_array", 1, ArduinoInfoCallback);
 
   ros::Publisher pub1 = nh.advertise<std_msgs::Float32MultiArray>("robot_go_array", 1);
-  ros::Publisher pub2 = nh.advertise<std_msgs::Bool>("ball_kick", 1);
+  ros::Publisher pub2 = nh.advertise<std_msgs::Bool>("ball_kick", 10);
 
   ros::AsyncSpinner spinner(1);
   spinner.start();
@@ -114,9 +114,10 @@ int main(int argc, char** argv){
     robot_go_angle();
     
     robot_go_array.data[1] = 100;
+    ball_kick.data = false;
+
     pub1.publish(robot_go_array);
-    //pub2.publish(ball_kick);
-    printf("angle: %f  speed: %f\n", robot_go_array.data[0], robot_go_array.data[1]);
+    pub2.publish(ball_kick);
 
     mutex.unlock();
     usleep(15000);

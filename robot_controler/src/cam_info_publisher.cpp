@@ -26,11 +26,11 @@ int y_offset = 360;
 ///collor range///
 struct orange{
   int hue_min_ = 55;
-  int hue_max_ = 90;
-  int sat_min_ = 85;
-  int sat_max_ = 230;
-  int val_min_ = 75;
-  int val_max_ = 195;
+  int hue_max_ = 95;
+  int sat_min_ = 125;
+  int sat_max_ = 255;
+  int val_min_ = 25;
+  int val_max_ = 135;
 };
 struct orange orange;
 ////////////
@@ -113,8 +113,6 @@ int main(int argc, char** argv){
         ball_point_array.data[1] = y_offset - mc_orange.y;
         
         pub.publish(ball_point_array);
-        
-        ROS_INFO("published");
 
         printf("x: %f  y: %f\n", ball_point_array.data[0], ball_point_array.data[1]);
 
