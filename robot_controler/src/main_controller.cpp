@@ -93,7 +93,7 @@ void robot_go_angle() {
 
 int main(int argc, char** argv){
   ball_point_array.data.resize(2);
-  robot_go_array.data.resize(3);
+  robot_go_array.data.resize(2);
 
   ros::init(argc, argv, "main_controler");
   ros::NodeHandle nh;
