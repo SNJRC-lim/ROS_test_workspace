@@ -1,14 +1,18 @@
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/videoio/videoio_c.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <chrono>
 
 ///options///
 //#define demo
+#define timer
 #define video_480p
 //#define video_720p
 //#define video_30fps
-#define video_60fps
+//#define video_60fps
+#define video_120fps
 ////////////
 
 ///set camera offset///
@@ -36,7 +40,7 @@ struct orange orange;
 ////////////
 
 ///Mat frame///
-cv::Mat frame ,hsv , frame_orange , frame_orange_glay;
+cv::Mat frame ,hsv , frame_orange;
 ////////////
 
 ///set moment point///
@@ -49,6 +53,10 @@ std_msgs::Float32MultiArray ball_point_array;
 ////////////
 
 using namespace cv;
+using namespace std::chrono;
+inline double get_time_sec(void){
+    return static_cast<double>(duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count())/1000000000;
+}
 
 int main(int argc, char** argv){
     ros::init(argc, argv, "cam_info_publisher");
@@ -56,7 +64,7 @@ int main(int argc, char** argv){
 	
 	ros::Publisher pub = nh.advertise<std_msgs::Float32MultiArray>("ball_point_array", 1);
 	
-	ros::Rate rate(60);
+	ros::Rate rate(120);
 
     VideoCapture capture(-1); // capture video
     
@@ -65,6 +73,9 @@ int main(int argc, char** argv){
 #endif
 #ifdef video_60fps
     capture.set(CAP_PROP_FPS, 60);  //set video fps
+#endif
+#ifdef video_120fps
+    capture.set(CAP_PROP_FPS, 120);  //set video fps
 #endif
 
 #ifdef video_480p
@@ -76,34 +87,52 @@ int main(int argc, char** argv){
     capture.set(CAP_PROP_FRAME_HEIGHT, 720);  //set video frame height
 #endif
 
+    capture.set(CAP_PROP_BUFFERSIZE, 4);
+    capture.set(CAP_PROP_FOURCC ,CV_FOURCC('M', 'J', 'P', 'G'));
+
 #ifdef demo
     char Example[] = "cam collor";
     namedWindow(Example, WINDOW_AUTOSIZE);  //create window
 #endif
 
     while(ros::ok()){
+#ifdef timer
+        double start,end;
+        start = get_time_sec();
+#endif
+
         capture >> frame;
 
-        frame_orange = frame.clone();  //clone frame to frame_orange
-        
         cvtColor(frame, hsv, COLOR_BGR2HSV);
-        
-        for(int y = 0; y < hsv.rows; y++){
-            for(int x = 0; x < hsv.cols; x++){
-                Vec3b data = hsv.at<Vec3b>(y,x);
-                if(data[0] < orange.hue_min_ || data[0] > orange.hue_max_ || data[1] < orange.sat_min_ || data[1] > orange.sat_max_ || data[2] < orange.val_min_ || data[2] > orange.val_max_){
-                    frame_orange.at<Vec3b>(y,x) = Vec3b(0, 0, 0);
-                }
-                else{
-                    frame_orange.at<Vec3b>(y,x) = Vec3b(255, 255, 255);
-                }
+
+        frame.release();
+
+        frame_orange = Mat(hsv.size(), CV_8UC1, Scalar(0));
+
+        int hsv_rows = hsv.rows;
+        int hsv_cols = hsv.cols;
+
+#pragma omp parallel for    
+        for(int y = 0; y < hsv_rows; y++){
+            const uchar *ptr_hsv = hsv.ptr<uchar>(y);
+            uchar *ptr_frame_orange = frame_orange.ptr<uchar>(y);
+#pragma omp parallel for
+            for(int x = 0; x < hsv_cols; x++){
+                uchar hue = ptr_hsv[3 * x + 0];
+                uchar sat = ptr_hsv[3 * x + 1];
+                uchar val = ptr_hsv[3 * x + 2];
+                if(hue < orange.hue_min_ || hue > orange.hue_max_)continue;
+                if(sat < orange.sat_min_ || sat > orange.sat_max_)continue;
+                if(val < orange.val_min_ || val > orange.val_max_)continue;
+                ptr_frame_orange[x] = 255;
             }
         }
 
-        cvtColor(frame_orange, frame_orange_glay, COLOR_BGR2GRAY); //convert frame_orange to glay scale
+        hsv.release();
 
-        mu_orange = moments(frame_orange_glay, true);
+        mu_orange = moments(frame_orange, true);
         mc_orange = Point2f( mu_orange.m10/mu_orange.m00 , mu_orange.m01/mu_orange.m00 );
+
 #ifdef demo
         circle(frame_orange, mc_orange, 4, Scalar(100), 2, 4);
 #endif
@@ -115,12 +144,19 @@ int main(int argc, char** argv){
         pub.publish(ball_point_array);
 
         printf("x: %f  y: %f\n", ball_point_array.data[0], ball_point_array.data[1]);
+        //ROS_INFO("published");
 
 #ifdef demo
         imshow(Example, frame_orange);  //show frame_orange
 #endif
+
+        frame_orange.release();
         
-        waitKey(1);
+#ifdef timer       
+        end = get_time_sec();
+        double elapsed=end-start;
+        printf("time: %f\n", elapsed);
+#endif
     }
     return(0);    
 }

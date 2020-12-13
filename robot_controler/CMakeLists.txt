@@ -5,6 +5,7 @@ project(robot_controler)
 #SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
 
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOTHER_STUFF=1" )
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
@@ -30,8 +31,8 @@ include_directories(
 
 link_directories(${OpenCV_LIB_DIRS})
 
-add_executable(main_controler src/main_controler.cpp)
-target_link_libraries(main_controler ${catkin_LIBRARIES})
+add_executable(main_controller src/main_controller.cpp)
+target_link_libraries(main_controller ${catkin_LIBRARIES})
 
 add_executable(cam_info_publisher src/cam_info_publisher.cpp)
 target_link_libraries(cam_info_publisher ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
