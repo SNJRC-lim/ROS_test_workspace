@@ -1,0 +1,21 @@
+<launch>
+  <arg name="model" default="$(find rcj_robot)/urdf/rcj_robot.urdf"/>
+  <arg name="gui" default="False"/>
+  <arg name="rvizconfig" default="$(find rcj_robot)/rviz/urdf.rviz"/>
+ 
+ <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="/home/snjrc-lim/catkin_ws_test/src/rcj_world/worlds/rcj_world.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+  <param name="use_gui" value="$(arg gui)"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true"/>
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model rcj_robot" />
+</launch>
