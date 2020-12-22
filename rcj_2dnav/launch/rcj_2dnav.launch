@@ -17,6 +17,13 @@
     <arg name="move_forward_only" value="$(arg move_forward_only)"/>
   </include>
 
+
+  <!-- laser_filter -->
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
+    <rosparam command="load" file="$(find rcj_2dnav)/config/$(arg laser_filter_file)" />
+    <remap from="scan" to="/filtered/scan" />
+  </node>
+
   <!-- rviz -->
   <group if="$(arg open_rviz)"> 
     <node pkg="rviz" type="rviz" name="rviz" required="true"
