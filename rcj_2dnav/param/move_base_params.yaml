@@ -1,0 +1,23 @@
+#move_baseが非活性化された状態である時、costmapを停止するか
+shutdown_costmap: false
+
+#ロボットベースに速度司指令をだすコントロール周期（Hz）
+controller_frequency: 10.0
+
+#space-clearingが実行される前、コントローラーが制御情報を受信するために待機する最大時間（sec）
+controller_patient: 1.0
+
+#全域計画の反復周期（Hz）
+planner_frequency: 5.0
+
+#space-clearingが実行される前、使用可能な計画を探索するときに待機する最大時間（sec）
+planner_patient: 1.0
+
+#recovery behaviourを実行する前にロボットが微動することを許容する時間（sec）
+oscillation_timeout: 10.0
+
+#ロボットが微動しないように動く必要がある距離（m, 指定された距離を移動後、oscillation_timeoutが初期化される）
+oscillation_distance: 0.2
+
+#recovery behaviourのcostmap初期化時に、これよりも遠い障害物は地図から削除される
+conservative_reset_dist: 2.0
