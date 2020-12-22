@@ -1,12 +1,14 @@
 <launch>
   <!-- Arguments -->
   <arg name="model" default="$(find rcj_robot)/urdf/rcj_robot.urdf"/>
-  <arg name="map_file" default="/home/snjrc-lim/maps/  "/>
+  <arg name="map_file_amcl" default="$(find rcj_robot)/maps/rcj_map_amcl.yaml"/>
+  <arg name="map_file_move_base" default="$(find rcj_robot)/maps/rcj_map_move_base.yaml"/>
   <arg name="open_rviz" default="true"/>
   <arg name="move_forward_only" default="false"/>
 
   <!-- Map server -->
-  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+  <node pkg="map_server" name="map_server_amcl" type="map_server" args="$(arg map_file_amcl)"/>
+  <node pkg="map_server" name="map_server_move_base" type="map_server" args="$(arg map_file_move_base)"/>
 
   <!-- AMCL -->
   <include file="$(find rcj_2dnav)/launch/amcl.launch"/>
