@@ -1,6 +1,7 @@
 <launch>
   <!-- Arguments -->
   <arg name="model" default="$(find rcj_robot)/urdf/rcj_robot.urdf"/>
+  <arg name="gui" default="False"/>
   <!--
   <arg name="map_file_amcl" default="$(find rcj_2dnav)/maps/rcj_map_amcl.yaml"/>
   <arg name="map_file_move_base" default="$(find rcj_2dnav)/maps/rcj_map_move_base.yaml"/> 
@@ -9,6 +10,16 @@
   <arg name="open_rviz" default="true"/>
   <arg name="move_forward_only" default="false"/>
   <arg name="laser_filter_file" default="$(find rcj_2dnav)/config/laser_filters.yaml"/>
+
+  <!--robot model-->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="/home/snjrc-lim/catkin_ws_test/src/rcj_world/worlds/rcj_world.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
 
   <!-- Map server -->
   <!--
@@ -38,4 +49,10 @@
     <node pkg="rviz" type="rviz" name="rviz" required="true"
           args="-d $(find rcj_2dnav)/rviz/simulation.rviz"/>
   </group>
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+  <param name="use_gui" value="$(arg gui)"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model rcj_robot" />
 </launch>
