@@ -89,6 +89,7 @@ int main(int argc, char** argv){
 
     capture.set(CAP_PROP_BUFFERSIZE, 4);
     capture.set(CAP_PROP_FOURCC ,CV_FOURCC('M', 'J', 'P', 'G'));
+    capture.set(CAP_PROP_EXPOSURE, 115);
 
 #ifdef demo
     char Example[] = "cam collor";
@@ -143,7 +144,7 @@ int main(int argc, char** argv){
         
         pub.publish(ball_point_array);
 
-        printf("x: %f  y: %f\n", ball_point_array.data[0], ball_point_array.data[1]);
+        //printf("x: %f  y: %f\n", ball_point_array.data[0], ball_point_array.data[1]);
         //ROS_INFO("published");
 
 #ifdef demo
